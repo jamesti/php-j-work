@@ -40,16 +40,16 @@ function base_validarCampoDB($tabela, $campos, array $valores) {
 
     reset($campos);
     reset($valores);
-
+    
     $where = "";
-
+    
     foreach ($campos as $value) {
-        $where .= "$value = '" . current($valores) . "' or ";
+        $where .= "$value = '".current($valores)."' or ";
         next($valores);
     }
-
+    
     $where = substr($where, 0, -3);
-
+    
     $query = "select $cps from $tabela where $where";
 
     $result = mysqli_query($con, $query);
@@ -82,7 +82,7 @@ function base_consultar_id($tabela, $campos, $id) {
 }
 
 function base_paginacao($numRegs, $pag) {
-
+    
     if ($numRegs > REGISTROS) {
         $pags = $numRegs / REGISTROS;
         if (is_real($pags)) {
@@ -92,12 +92,12 @@ function base_paginacao($numRegs, $pag) {
     } else {
         return;
     }
-
+    
     $pagination = "\n<div class='pagination'>
                       <ul>\n";
-
+    
     $pagina = $pag['pag'] == NULL ? 1 : $pag['pag'];
-
+    
     for ($i = 1; $i <= $pags; $i++) {
         if ($pagina == $i) {
             $pagination .= "    <li class='active'><a href='?view={$pag['view']}&pag=$i'>$i</a></li>\n";
@@ -105,18 +105,11 @@ function base_paginacao($numRegs, $pag) {
             $pagination .= "    <li><a href='?view={$pag['view']}&pag=$i'>$i</a></li>\n";
         }
     }
-
+    
     $pagination .= "   </ul>
                     </div>\n";
-
+    
     return $pagination;
-}
-
-function base_consultaOrdenamento($campo, $order) {
-
-    $order = $order == NULL ? 0 : $order;
-
-    return " ORDER BY {$campo[$order]}";
 }
 
 function base_consultar($tabela, $campos, $colunas, $view, array $filtro = null) {
@@ -127,19 +120,17 @@ function base_consultar($tabela, $campos, $colunas, $view, array $filtro = null)
     $query = "select $cps from $tabela " . base_filtrosConsulta($filtro) . " LIMIT 1000";
 
     $regsResult = mysqli_query($con, $query);
-
+    
     $regs = mysqli_num_rows($regsResult);
-
+    
     $pag = router_filterController();
-
+        
     $pagina = $pag['pag'] == NULL || $pag['pag'] == 1 ? 0 : $pag['pag'] - 1;
-
+    
     $query = substr($query, 0, -11);
-
-    $query .= base_consultaOrdenamento($campos, $pag['order']);
-
+    
     $query .= " LIMIT " . $pagina * REGISTROS . "," . REGISTROS;
-
+    
     $result = mysqli_query($con, $query);
 
     if (mysqli_error($con)) {
@@ -148,15 +139,8 @@ function base_consultar($tabela, $campos, $colunas, $view, array $filtro = null)
         $table = '<table class="table table-hover">
 				<thead>
 					<tr>';
-        $i = 0;
-        $order = $pag['order'] == NULL ? 0 : $pag['order'];
         foreach ($colunas as $value) {
-            if ($order == $i) {
-                $table .= "<th><i class='icon-chevron-down'></i>$value</th>";
-            } else {
-                $table .= "<th><a href='?view={$pag['view']}&order=" . $i . "'>$value</a></th>";
-            }
-            $i++;
+            $table .= "<th>$value</th>";
         }
         $table .= "<th>Ações</th>
 				</tr>
@@ -174,7 +158,7 @@ function base_consultar($tabela, $campos, $colunas, $view, array $filtro = null)
 				</table>\n";
 
         $pagination = base_paginacao($regs, $pag);
-
+        
         return $table . $pagination;
     }
 }

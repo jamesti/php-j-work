@@ -54,8 +54,7 @@ function router_filterController() {
     $filtros = array("action" => array("filter" => FILTER_SANITIZE_STRING),
         "view" => array("filter" => FILTER_SANITIZE_STRING),
         "id" => array("filter" => FILTER_VALIDATE_INT),
-        "pag" => array("filter" => FILTER_VALIDATE_INT),
-        "order" => array("filter" => FILTER_VALIDATE_INT));
+        "pag" => array("filter" => FILTER_VALIDATE_INT));
 
     return $result = filter_input_array(INPUT_GET, $filtros);
 }
