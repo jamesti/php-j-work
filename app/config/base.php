@@ -81,13 +81,56 @@ function base_consultar_id($tabela, $campos, $id) {
     }
 }
 
+function base_paginacao($numRegs, $pag) {
+    
+    if ($numRegs > REGISTROS) {
+        $pags = $numRegs / REGISTROS;
+        if (is_real($pags)) {
+            $pags++;
+            $pags = intval($pags);
+        }
+    } else {
+        return;
+    }
+    
+    $pagination = "\n<div class='pagination'>
+                      <ul>\n";
+    
+    $pagina = $pag['pag'] == NULL ? 1 : $pag['pag'];
+    
+    for ($i = 1; $i <= $pags; $i++) {
+        if ($pagina == $i) {
+            $pagination .= "    <li class='active'><a href='?view={$pag['view']}&pag=$i'>$i</a></li>\n";
+        } else {
+            $pagination .= "    <li><a href='?view={$pag['view']}&pag=$i'>$i</a></li>\n";
+        }
+    }
+    
+    $pagination .= "   </ul>
+                    </div>\n";
+    
+    return $pagination;
+}
+
 function base_consultar($tabela, $campos, $colunas, $view, array $filtro = null) {
     $con = base_conectar();
 
     $cps = implode(",", $campos);
 
-    $query = "select $cps from $tabela " . base_filtrosConsulta($filtro);
+    $query = "select $cps from $tabela " . base_filtrosConsulta($filtro) . " LIMIT 1000";
 
+    $regsResult = mysqli_query($con, $query);
+    
+    $regs = mysqli_num_rows($regsResult);
+    
+    $pag = router_filterController();
+        
+    $pagina = $pag['pag'] == NULL || $pag['pag'] == 1 ? 0 : $pag['pag'] - 1;
+    
+    $query = substr($query, 0, -11);
+    
+    $query .= " LIMIT " . $pagina * REGISTROS . "," . REGISTROS;
+    
     $result = mysqli_query($con, $query);
 
     if (mysqli_error($con)) {
@@ -112,9 +155,11 @@ function base_consultar($tabela, $campos, $colunas, $view, array $filtro = null)
             $table .= "</tr>";
         }
         $table .= "</tbody>
-				</table>";
+				</table>\n";
 
-        return $table;
+        $pagination = base_paginacao($regs, $pag);
+        
+        return $table . $pagination;
     }
 }
 

@@ -3,6 +3,7 @@
 define("SISTEMA", "Sistema de Tarefas");
 define("VERSAO", "1.0");
 define("SESSION_TIME", 600);
+define("REGISTROS", 10);
 define("DB", "db_tarefa");
 define("DB_USER", "root");
 define("DB_PASSWORD", "");
