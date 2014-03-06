@@ -66,9 +66,9 @@ function router_filterController() {
 function router_setSession() {
     $acesso = md5(date('d') . REMOTE_IP . REMOTE_USER_AGENT);
 
-    session_id($acesso + SESSION_TIME / 60);
+    session_id($acesso + SESSION_TIME);
     session_name($acesso);
-    session_cache_expire(SESSION_TIME);
+    session_cache_expire(SESSION_TIME / 3);
     session_start();
 
     router_setSessionTime();

@@ -119,7 +119,7 @@ function base_consultaOrdenamento($campo, $order) {
     return " ORDER BY {$campo[$order]}";
 }
 
-function base_consultar($tabela, $campos, $colunas, $view, array $filtro = null) {
+function base_consultar($tabela, $campos, $colunas, $view, array $filtro = NULL, array $acoes = NULL) {
     $con = base_conectar();
 
     $cps = implode(",", $campos);
@@ -167,7 +167,7 @@ function base_consultar($tabela, $campos, $colunas, $view, array $filtro = null)
             foreach ($campos as $value) {
                 $table .= "<td>{$linha[$value]}</td>";
             }
-            $table .= "<td>" . base_botaoEditar($view, $linha[0]) . " | " . base_botaoExcluir($view, $linha[0]) . "</td>";
+            $table .= "<td>" . base_montarAcoes($view, $linha[0], $acoes) . "</td>";
             $table .= "</tr>";
         }
         $table .= "</tbody>
@@ -207,6 +207,28 @@ function base_filtrosConsulta(array $filtro = null) {
 
         return "";
     }
+}
+
+function base_montarAcoes($view, $cod, array $acoes = NULL) {
+    if ($acoes == NULL || !is_array($acoes)) {        
+        return $rs = base_botaoDetalhes($view, $cod) . " | " . base_botaoEditar($view, $cod) . " | " . base_botaoExcluir($view, $cod);
+    } else {
+        $rs = array();
+        if (in_array("detalhes", $acoes)) {
+            $rs[] = base_botaoDetalhes($view, $cod);
+        }
+        if (in_array("editar", $acoes)) {
+            $rs[] = base_botaoEditar($view, $cod);
+        }
+        if (in_array("excluir", $acoes)) {
+            $rs[] = base_botaoExcluir($view, $cod);
+        }
+        return $rs = implode(" | ", $rs);
+    }
+}
+
+function base_botaoDetalhes($view, $cod) {
+    return "<a href='?action=detalhes&view=$view&id=$cod'><i class='icon-list-alt'></i> Detalhes</a>";
 }
 
 function base_botaoEditar($view, $cod) {
@@ -332,14 +354,14 @@ function base_formBotaoCadastrar($view) {
     return '<a href="?action=cadastro&view=' . $view . '" class="btn btn-primary" type="button">Cadastrar Novo ' . ucfirst(substr($view, 0, -1)) . '</a>';
 }
 
-function base_htmlAutoFormConsultar($tabela, $campos, $colunas, $view, array $filtros = NULL) {
+function base_htmlAutoFormConsultar($tabela, $campos, $colunas, $view, array $filtros = NULL, array $acoes = NULL) {
     $html = base_breadcrumbs();
 
     if ($filtros != NULL) {
         $html .= base_formConsulta($view);
     }
 
-    $html .= base_consultar($tabela, $campos, $colunas, $view, $filtros);
+    $html .= base_consultar($tabela, $campos, $colunas, $view, $filtros, $acoes);
 
     $html .= base_formBotaoCadastrar($view);
 

@@ -8,4 +8,6 @@ $colunas = array("Código","Login","E-mail","Perfil","Data de Criação");
 
 $filtros = array('login','email');
 
-echo base_htmlAutoFormConsultar("tbl_usuario", $campos, $colunas, "usuarios", $filtros);
+$acoes = array('editar','excluir');
+
+echo base_htmlAutoFormConsultar("tbl_usuario", $campos, $colunas, "usuarios", $filtros, $acoes);
